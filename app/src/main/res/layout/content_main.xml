@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.v4.widget.DrawerLayout  xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    app:layout_behavior="@string/appbar_scrolling_view_behavior"
+    tools:context="cn.aki.anonymous.MainActivity"
+    tools:showIn="@layout/app_bar_main">
+
+    <ListView
+        android:id="@+id/content_list"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="#000"/>
+    <ListView
+        android:id="@+id/channel_list"
+        android:layout_gravity="end"
+        android:layout_width="120dp"
+        android:layout_height="match_parent"
+        android:background="#f71e06"/>
+
+</android.support.v4.widget.DrawerLayout >

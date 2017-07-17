@@ -6,7 +6,8 @@ package cn.aki.anonymous.utils
  */
 object C {
     object Api{
-        const val domain = "https://h.nimingban.com/"
-        const val postList = domain + "Api/showf"
+        const val DOMAIN = "https://h.nimingban.com/"
+        const val POST_LIST = DOMAIN + "Api/showf"
+        const val FORUM_LIST = "http://cover.acfunwiki.org/cn.json"
     }
 }

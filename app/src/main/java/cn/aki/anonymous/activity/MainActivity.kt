@@ -1,6 +1,7 @@
 package cn.aki.anonymous.activity
 
 import android.os.Bundle
+import android.os.Handler
 import android.support.design.widget.NavigationView
 import android.support.v4.view.GravityCompat
 import android.support.v7.app.ActionBarDrawerToggle
@@ -19,7 +20,6 @@ import cn.aki.anonymous.utils.HttpUtils
 import cn.aki.anonymous.utils.MyBaseAdapter
 import com.alibaba.fastjson.JSON
 import com.google.common.base.Throwables
-import com.google.common.collect.Lists
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.app_bar_main.*
 import kotlinx.android.synthetic.main.content_main.*
@@ -28,9 +28,9 @@ import okhttp3.Callback
 import okhttp3.Request
 import okhttp3.Response
 import java.io.IOException
-import java.util.*
 
 class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelectedListener {
+    private val mHandler = Handler()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -104,24 +104,24 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                     Log.e("loadForum", "no response")
                     return
                 }
-                val result = response.body().toString()
-                Log.d("loadForum", result)
-                val listDto = JSON.parseObject(result, ForumListDto::class.java)
+                val listDto = JSON.parseObject(response.body()!!.string(), ForumListDto::class.java)
                 if(!listDto.success || listDto.forum == null){
                     Log.e("loadForum", "fail")
                     return
                 }
-                channel_list.adapter = object : MyBaseAdapter<Forum>(listDto.forum!!) {
-                    override fun getView(position: Int, convertView: View?, parent: ViewGroup?): View {
-                        val item = getItem(position)
-                        if (convertView == null || convertView !is TextView) {
-                            val view = View.inflate(this@MainActivity, R.layout.item_forum, null) as TextView
-                            view.text = item.name
-                            view.tag = item
-                            return view
-                        } else {
-                            convertView.text = item.name
-                            return convertView
+                mHandler.post {
+                    channel_list.adapter = object : MyBaseAdapter<Forum>(listDto.forum!!) {
+                        override fun getView(position: Int, convertView: View?, parent: ViewGroup?): View {
+                            val item = getItem(position)
+                            if (convertView == null || convertView !is TextView) {
+                                val view = View.inflate(this@MainActivity, R.layout.item_forum, null) as TextView
+                                view.text = item.name
+                                view.tag = item
+                                return view
+                            } else {
+                                convertView.text = item.name
+                                return convertView
+                            }
                         }
                     }
                 }

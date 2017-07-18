@@ -17,6 +17,6 @@ public class ExampleUnitTest {
         // https://h.nimingban.com/Api/showf?id=综合1&page=2
         System.err.println(ACUrl.getPostListUrl("综合1", 1));
 
-        System.err.println(C.Api.postList);
+        System.err.println(C.Api.THREAD_LIST);
     }
 }

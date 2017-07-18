@@ -9,15 +9,13 @@
     tools:showIn="@layout/app_bar_main">
 
     <ListView
-        android:id="@+id/content_list"
+        android:id="@+id/thread_list"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:background="#000"/>
+        android:layout_height="match_parent"/>
     <ListView
-        android:id="@+id/channel_list"
+        android:id="@+id/forum_list"
         android:layout_gravity="end"
-        android:layout_width="120dp"
-        android:layout_height="match_parent"
-        android:background="#f71e06"/>
+        android:layout_width="200dp"
+        android:layout_height="match_parent"/>
 
 </android.support.v4.widget.DrawerLayout >

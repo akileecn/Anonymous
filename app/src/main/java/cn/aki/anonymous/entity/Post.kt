@@ -1,5 +1,7 @@
 package cn.aki.anonymous.entity
 
+import cn.aki.anonymous.utils.DataUtils
+
 /**
  * Created by Administrator on 2017/7/18.
  * 子串
@@ -16,4 +18,9 @@ data class Post(
         var content: String = "",
         var sage: Boolean = false,
         var admin: Boolean = false
-)
+) {
+    val recodeNow: String
+        get() = DataUtils.recodeNow(now)
+    val recodeId: String
+        get() = DataUtils.recodeId(id)
+}

@@ -10,6 +10,7 @@ import java.io.IOException
 
 /**
  * Created by Administrator on 2017/7/18.
+ * 串dao
  */
 class PostDao {
     private val mHttpClient = OkHttpClient()

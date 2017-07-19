@@ -22,12 +22,15 @@ class ForumDao(context: Context) {
 
     fun list(callback: (list: List<Forum>) -> Unit) {
         if (isInit()) {
-            return callback(doList())
+            callback(doList())
         } else {
-            return init(callback)
+            init(callback)
         }
     }
 
+    /**
+     * 从数据库中加载
+     */
     private fun doList(): List<Forum> {
         val db = mHelper.readableDatabase
         val cursor = db.rawQuery("select ${C.DB.FORUM_ID}, ${C.DB.FORUM_NAME} from ${C.DB.TABLE_FORUM}", null)
@@ -40,6 +43,9 @@ class ForumDao(context: Context) {
         return result
     }
 
+    /**
+     * 初始化数据库数据
+     */
     private fun init(callback: (list: List<Forum>) -> Unit) {
         if (isInit()) return
         val request = Request.Builder().url(C.Api.FORUM_LIST).build()

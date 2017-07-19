@@ -6,11 +6,14 @@ import android.support.design.widget.NavigationView
 import android.support.v4.view.GravityCompat
 import android.support.v7.app.ActionBarDrawerToggle
 import android.support.v7.app.AppCompatActivity
+import android.text.Html
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
+import android.widget.AbsListView
 import android.widget.TextView
+import android.widget.Toast
 import cn.aki.anonymous.R
 import cn.aki.anonymous.entity.Forum
 import cn.aki.anonymous.entity.PostThread
@@ -23,12 +26,16 @@ import kotlinx.android.synthetic.main.item_content.view.*
 
 class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelectedListener {
     private val mHandler = Handler()
-    private var mCurrentForumId: Int = 0
+    private var mCurrentForumId: Int = 0 // 当前版块ID
+    @Volatile private var mLoading: Boolean = false // 是否正在加载
+    private var mCurrentPage: Int = 0 // 当前页数
+    private var mThreadList = mutableListOf<PostThread>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         initView()
-        loadForum()
+        initListener()
+        initData()
     }
 
     override fun onBackPressed() {
@@ -91,11 +98,53 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         main_layout.addDrawerListener(toggle)
         toggle.syncState()
         nav_view.setNavigationItemSelectedListener(this)
+
+    }
+
+    /**
+     * 初始化监听器
+     */
+    private fun initListener() {
         forum_list.setOnItemClickListener { _, view, _, _ ->
             val forum = view.tag as Forum
-            if(forum.id != mCurrentForumId){
+            if (forum.id != mCurrentForumId) {
                 mCurrentForumId = forum.id
-                loadThread(mCurrentForumId, 1)
+                content_dl.closeDrawer(GravityCompat.END)
+                loadThread(true)
+            }
+        }
+        thread_srl.setOnRefreshListener {
+            loadThread(true)
+        }
+        thread_list.setOnScrollListener(object : AbsListView.OnScrollListener {
+            override fun onScroll(view: AbsListView?, firstVisibleItem: Int, visibleItemCount: Int, totalItemCount: Int) {
+            }
+
+            override fun onScrollStateChanged(view: AbsListView?, scrollState: Int) {
+                if ((scrollState == AbsListView.OnScrollListener.SCROLL_STATE_IDLE
+                        || scrollState == AbsListView.OnScrollListener.SCROLL_STATE_FLING
+                        ) && view!!.lastVisiblePosition >= view.count - 1) {
+                    loadThread()
+                }
+            }
+
+        })
+    }
+
+    /**
+     * 初始化数据
+     */
+    private fun initData() {
+        loadForum()
+        thread_list.adapter = object : MyBaseAdapter<PostThread>(mThreadList) {
+            override fun getView(position: Int, convertView: View?, parent: ViewGroup?): View {
+                val item = getItem(position)
+                val view = convertView ?: View.inflate(this@MainActivity, R.layout.item_content, null)
+                view.text_user_id.text = item.userid
+                view.text_id.text = item.recodeId
+                view.text_now.text = item.recodeNow
+                view.text_content.text = Html.fromHtml(item.content)
+                return view
             }
         }
     }
@@ -115,11 +164,11 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                         return view
                     }
                 }
-                for((id) in it){
+                for ((id) in it) {
                     // 加载第一个非时间线版块
-                    if(id != -1){
+                    if (id != -1) {
                         mCurrentForumId = id
-                        loadThread(id, 1)
+                        loadThread()
                         return@post
                     }
                 }
@@ -130,20 +179,25 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     /**
      * 加载串列表
      */
-    private fun loadThread(forumId: Int, page: Int){
-        DataClient.listThread(forumId, page){
+    private fun loadThread(refresh: Boolean = false) {
+        if (mLoading) return
+        mLoading = true
+        if (refresh) {
+            mCurrentPage = 1
+        } else {
+            mCurrentPage++
+        }
+        DataClient.listThread(mCurrentForumId, mCurrentPage) {
             mHandler.post {
-                thread_list.adapter = object : MyBaseAdapter<PostThread>(it) {
-                    override fun getView(position: Int, convertView: View?, parent: ViewGroup?): View {
-                        val item = getItem(position)
-                        val view = convertView ?: View.inflate(this@MainActivity, R.layout.item_content, null)
-                        view.text_user_id.text = item.userid
-                        view.text_id.text = item.id
-                        view.text_now.text = item.now
-                        view.text_content.loadDataWithBaseURL(null, item.content, "text/html", "utf-8", null)
-                        return view
-                    }
+                thread_srl.isRefreshing = false
+                mLoading = false
+                if (it.isEmpty()) {
+                    Toast.makeText(this@MainActivity, "无更多数据", Toast.LENGTH_SHORT).show()
+                    return@post
                 }
+                if (refresh) mThreadList.clear()
+                mThreadList.addAll(mThreadList.size, it)
+                thread_list.requestLayout()
             }
         }
     }

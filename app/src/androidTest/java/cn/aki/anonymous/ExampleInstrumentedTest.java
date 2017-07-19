@@ -1,11 +1,18 @@
 package cn.aki.anonymous;
 
 import android.content.Context;
+import android.provider.Settings;
 import android.support.test.InstrumentationRegistry;
 import android.support.test.runner.AndroidJUnit4;
+import android.text.format.DateUtils;
+import android.util.Log;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
+
+import java.util.Date;
+
+import cn.aki.anonymous.utils.DataUtils;
 
 import static org.junit.Assert.*;
 
@@ -21,6 +28,6 @@ public class ExampleInstrumentedTest {
         // Context of the app under test.
         Context appContext = InstrumentationRegistry.getTargetContext();
 
-        assertEquals("cn.aki.aisland", appContext.getPackageName());
+        assertEquals("cn.aki.anonymous", appContext.getPackageName());
     }
 }

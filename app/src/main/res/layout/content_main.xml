@@ -2,20 +2,27 @@
 <android.support.v4.widget.DrawerLayout  xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/content_dl"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
     tools:context="cn.aki.anonymous.activity.MainActivity"
     tools:showIn="@layout/app_bar_main">
-
-    <ListView
-        android:id="@+id/thread_list"
+    <android.support.v4.widget.SwipeRefreshLayout
+        android:id="@+id/thread_srl"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"/>
+        android:layout_height="match_parent">
+        <ListView
+            android:id="@+id/thread_list"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"/>
+    </android.support.v4.widget.SwipeRefreshLayout>
     <ListView
         android:id="@+id/forum_list"
         android:layout_gravity="end"
         android:layout_width="200dp"
-        android:layout_height="match_parent"/>
+        android:layout_height="match_parent"
+        android:divider="@null"
+        android:background="#FFF"/>
 
 </android.support.v4.widget.DrawerLayout >

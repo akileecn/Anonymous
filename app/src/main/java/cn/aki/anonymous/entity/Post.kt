@@ -6,7 +6,7 @@ import cn.aki.anonymous.utils.DataUtils
  * Created by Administrator on 2017/7/18.
  * 子串
  */
-data class Post(
+open class Post(
         var id: String = "",
         var img: String = "",
         var ext: String = "",

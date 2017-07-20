@@ -8,15 +8,20 @@
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
     tools:context="cn.aki.anonymous.activity.MainActivity"
     tools:showIn="@layout/app_bar_main">
-    <android.support.v4.widget.SwipeRefreshLayout
-        android:id="@+id/thread_srl"
+    <cn.aki.anonymous.view.ContentLayout
+        android:id="@+id/thread_main"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
-        <ListView
-            android:id="@+id/thread_list"
+        <android.support.v4.widget.SwipeRefreshLayout
+            android:id="@+id/thread_srl"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"/>
-    </android.support.v4.widget.SwipeRefreshLayout>
+            android:layout_height="match_parent">
+            <ListView
+                android:id="@+id/thread_list"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"/>
+        </android.support.v4.widget.SwipeRefreshLayout>
+    </cn.aki.anonymous.view.ContentLayout>
     <ListView
         android:id="@+id/forum_list"
         android:layout_gravity="end"

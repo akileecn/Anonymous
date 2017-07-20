@@ -22,8 +22,6 @@ import okhttp3.Response;
 public class ExampleUnitTest {
     @Test
     public void addition_isCorrect() throws Exception {
-        Request request = new Request.Builder().url("http://sdfdfd").build();
-        Response response = new OkHttpClient().newCall(request).execute();
-        System.err.println(JSON.toJSONString(response));
+        System.err.println(DataUtils.INSTANCE.unicode2string("\\u8be5\\u677f\\u5757\\u4e0d\\u5b58\\u5728"));
     }
 }

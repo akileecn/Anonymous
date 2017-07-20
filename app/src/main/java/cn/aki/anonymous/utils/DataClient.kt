@@ -24,14 +24,14 @@ object DataClient {
     /**
      * 版块列表
      */
-    fun listForum(callback: (list: List<Forum>) -> Unit){
+    fun listForum(callback: (result: Result<List<Forum>>) -> Unit){
         mForumDao!!.list(callback)
     }
 
     /**
      * 串列表
      */
-    fun listThread(forumId: Int, page: Int, callback: (list: List<PostThread>) -> Unit){
+    fun listThread(forumId: Int, page: Int, callback: (list: Result<List<PostThread>>) -> Unit){
         mThreadDao!!.listThread(forumId, page, callback)
     }
 

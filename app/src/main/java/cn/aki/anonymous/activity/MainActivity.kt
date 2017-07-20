@@ -1,7 +1,6 @@
 package cn.aki.anonymous.activity
 
 import android.os.Bundle
-import android.os.Handler
 import android.support.design.widget.NavigationView
 import android.support.v4.view.GravityCompat
 import android.support.v7.app.ActionBarDrawerToggle
@@ -13,11 +12,11 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.AbsListView
 import android.widget.TextView
-import android.widget.Toast
 import cn.aki.anonymous.R
 import cn.aki.anonymous.entity.Forum
 import cn.aki.anonymous.entity.PostThread
 import cn.aki.anonymous.utils.DataClient
+import cn.aki.anonymous.utils.MessageUtils
 import cn.aki.anonymous.utils.MyBaseAdapter
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.app_bar_main.*
@@ -25,7 +24,6 @@ import kotlinx.android.synthetic.main.content_main.*
 import kotlinx.android.synthetic.main.item_content.view.*
 
 class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelectedListener {
-    private val mHandler = Handler()
     private var mCurrentForumId: Int = 0 // 当前版块ID
     @Volatile private var mLoading: Boolean = false // 是否正在加载
     private var mCurrentPage: Int = 0 // 当前页数
@@ -154,8 +152,8 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
      */
     private fun loadForum() {
         DataClient.listForum {
-            mHandler.post {
-                forum_list.adapter = object : MyBaseAdapter<Forum>(it) {
+            if (it.success) {
+                forum_list.adapter = object : MyBaseAdapter<Forum>(it.data!!) {
                     override fun getView(position: Int, convertView: View?, parent: ViewGroup?): View {
                         val item = getItem(position)
                         val view = (convertView ?: View.inflate(this@MainActivity, R.layout.item_forum, null)) as TextView
@@ -164,14 +162,16 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                         return view
                     }
                 }
-                for ((id) in it) {
+                for (item in it.data) {
                     // 加载第一个非时间线版块
-                    if (id != -1) {
-                        mCurrentForumId = id
+                    if (item.id != -1) {
+                        mCurrentForumId = item.id
                         loadThread()
-                        return@post
+                        break
                     }
                 }
+            } else {
+                MessageUtils.showToast(this@MainActivity, it.message!!)
             }
         }
     }
@@ -182,22 +182,23 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     private fun loadThread(refresh: Boolean = false) {
         if (mLoading) return
         mLoading = true
-        if (refresh) {
-            mCurrentPage = 1
-        } else {
-            mCurrentPage++
-        }
+        if (refresh) mCurrentPage = 1 else mCurrentPage++
         DataClient.listThread(mCurrentForumId, mCurrentPage) {
-            mHandler.post {
-                thread_srl.isRefreshing = false
-                mLoading = false
-                if (it.isEmpty()) {
-                    Toast.makeText(this@MainActivity, "无更多数据", Toast.LENGTH_SHORT).show()
-                    return@post
+            mLoading = false
+            thread_srl.isRefreshing = false
+            if (it.success) {
+                thread_main.hideError()
+                if (it.data!!.isEmpty()) {
+                    MessageUtils.showToast(this@MainActivity, "无更多数据")
+                    return@listThread
                 }
                 if (refresh) mThreadList.clear()
-                mThreadList.addAll(mThreadList.size, it)
+                mThreadList.addAll(mThreadList.size, it.data)
                 thread_list.requestLayout()
+            } else {
+                thread_main.showError(it.message!!){
+                    loadThread(true)
+                }
             }
         }
     }

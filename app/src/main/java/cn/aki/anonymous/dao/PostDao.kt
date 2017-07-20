@@ -1,36 +1,26 @@
 package cn.aki.anonymous.dao
 
-import android.util.Log
 import cn.aki.anonymous.entity.PostThread
 import cn.aki.anonymous.utils.C
+import cn.aki.anonymous.utils.JsonHttpTask
+import cn.aki.anonymous.utils.Result
 import com.alibaba.fastjson.JSON
-import com.google.common.base.Throwables
-import okhttp3.*
-import java.io.IOException
+import okhttp3.Request
 
 /**
  * Created by Administrator on 2017/7/18.
  * 串dao
  */
 class PostDao {
-    private val mHttpClient = OkHttpClient()
-
-    fun listThread(forumId: Int, page: Int, callback: (list: List<PostThread>) -> Unit){
+    fun listThread(forumId: Int, page: Int, callback: (result: Result<List<PostThread>>) -> Unit) {
         val request = Request.Builder().url(C.Api.createUrl(C.Api.THREAD_LIST, forumId, page)).build()
-        mHttpClient.newCall(request).enqueue(object : Callback {
-            override fun onResponse(call: Call?, response: Response?) {
-                if (response == null || !response.isSuccessful) {
-                    Log.e("listThread", "no response")
-                    return
-                }
-                val result = response.body()!!.string()
-                val threads = JSON.parseArray(result, PostThread::class.java)
-                callback(threads.toList())
+        JsonHttpTask(request) {
+            if (it.success) {
+                val threads = JSON.parseArray(it.data, PostThread::class.java)
+                callback(Result.success(threads))
+            } else {
+                callback(Result.fail(it.message))
             }
-
-            override fun onFailure(call: Call?, e: IOException?) {
-                Log.e("listThread", Throwables.getStackTraceAsString(e))
-            }
-        })
+        }.execute()
     }
 }

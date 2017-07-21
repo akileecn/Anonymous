@@ -4,6 +4,7 @@ import android.content.Context
 import cn.aki.anonymous.dao.ForumDao
 import cn.aki.anonymous.dao.PostDao
 import cn.aki.anonymous.entity.Forum
+import cn.aki.anonymous.entity.Post
 import cn.aki.anonymous.entity.PostThread
 
 /**
@@ -33,6 +34,13 @@ object DataClient {
      */
     fun listThread(forumId: Int, page: Int, callback: (list: Result<List<PostThread>>) -> Unit){
         mThreadDao!!.listThread(forumId, page, callback)
+    }
+
+    /**
+     * 串回复列表
+     */
+    fun listPost(threadId: Int, page: Int, callback: (result: Result<PostThread>) -> Unit){
+        mThreadDao!!.listPost(threadId, page, callback)
     }
 
 }

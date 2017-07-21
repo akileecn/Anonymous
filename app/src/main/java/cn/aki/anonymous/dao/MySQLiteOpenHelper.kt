@@ -7,6 +7,7 @@ import cn.aki.anonymous.utils.C
 
 /**
  * Created by Administrator on 2017/7/18.
+ * 本地数据库帮助类
  */
 class MySQLiteOpenHelper(context: Context) : SQLiteOpenHelper(context, "anonymous.db", null, 1){
 

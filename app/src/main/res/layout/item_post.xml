@@ -28,7 +28,6 @@
         android:id="@+id/text_content"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:maxHeight="200dp"
         android:layout_below="@+id/text_user_id" />
 
     <ImageView

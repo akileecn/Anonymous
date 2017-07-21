@@ -6,14 +6,26 @@ package cn.aki.anonymous.utils
  */
 object C {
     object Api{
-        const val FORUM_LIST = "http://cover.acfunwiki.org/cn.json"
+        const val FORUM_LIST = "http://cover.acfunwiki.org/cn.json" //
         // https://h.nimingban.com/Api/showf?appid=nimingban&id=4&page=1
 //        const val DOMAIN = "https://h.nimingban.com"
-        const val DOMAIN = "http://h.adnmb.com"
-        const val THREAD_LIST = DOMAIN + "/Api/showf"
+        private const val DOMAIN = "http://h.adnmb.com"
+        const val THREAD_LIST = DOMAIN + "/Api/showf" // 串列表
+        const val POST_LIST = DOMAIN + "/Api/thread"  // 回复列表
+        private const val IMAGE_DOMAIN = "http://h.adnmb.com/Public/Upload" // 图片服务器域名
+        const val IMAGE_BASE = IMAGE_DOMAIN + "/image" // 图片基本路径
+        const val THUMB_BASE = IMAGE_DOMAIN + "/thumb" // 缩略图基本路径
 
         fun createUrl(api: String, id: Int, page: Int): String{
             return "$api?id=$id&page=$page"
+        }
+
+        fun createImageUrl(img: String, ext: String): String{
+            return "$IMAGE_BASE/$img$ext"
+        }
+
+        fun createThumbUrl(img: String, ext: String): String{
+            return "$THUMB_BASE/$img$ext"
         }
     }
     object DB{
@@ -28,6 +40,9 @@ object C {
     }
     // intent extra key
     object Extra{
-        const val ERROR_MESSAGE = "error_message"
+        // 图片连接
+        const val IMAGE_URL = "IMAGE_URL"
+        // 串ID
+        const val THREAD_ID = "THREAD_ID"
     }
 }

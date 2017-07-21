@@ -1,6 +1,8 @@
 package cn.aki.anonymous.activity
 
+import android.content.Intent
 import android.os.Bundle
+import android.support.annotation.UiThread
 import android.support.design.widget.NavigationView
 import android.support.v4.view.GravityCompat
 import android.support.v7.app.ActionBarDrawerToggle
@@ -11,10 +13,12 @@ import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
 import android.widget.AbsListView
+import android.widget.BaseAdapter
 import android.widget.TextView
 import cn.aki.anonymous.R
 import cn.aki.anonymous.entity.Forum
 import cn.aki.anonymous.entity.PostThread
+import cn.aki.anonymous.utils.C
 import cn.aki.anonymous.utils.DataClient
 import cn.aki.anonymous.utils.MessageUtils
 import cn.aki.anonymous.utils.MyBaseAdapter
@@ -103,17 +107,20 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
      * 初始化监听器
      */
     private fun initListener() {
+        // 加载版块串列表
         forum_list.setOnItemClickListener { _, view, _, _ ->
             val forum = view.tag as Forum
+            content_dl.closeDrawer(GravityCompat.END)
             if (forum.id != mCurrentForumId) {
                 mCurrentForumId = forum.id
-                content_dl.closeDrawer(GravityCompat.END)
                 loadThread(true)
             }
         }
+        // 下拉刷新
         thread_srl.setOnRefreshListener {
             loadThread(true)
         }
+        // 滚动加载
         thread_list.setOnScrollListener(object : AbsListView.OnScrollListener {
             override fun onScroll(view: AbsListView?, firstVisibleItem: Int, visibleItemCount: Int, totalItemCount: Int) {
             }
@@ -127,6 +134,13 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             }
 
         })
+        // 打开子串列表
+        thread_list.setOnItemClickListener { _, view, _, _ ->
+            val id = view.tag as Int
+            val intent = Intent(this, ThreadActivity::class.java)
+            intent.putExtra(C.Extra.THREAD_ID, id)
+            startActivity(intent)
+        }
     }
 
     /**
@@ -134,14 +148,20 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
      */
     private fun initData() {
         loadForum()
+        // 打开图片展示页面
+        val imageClickListener = ImageActivity.OpenOnClickListener(this)
         thread_list.adapter = object : MyBaseAdapter<PostThread>(mThreadList) {
             override fun getView(position: Int, convertView: View?, parent: ViewGroup?): View {
                 val item = getItem(position)
                 val view = convertView ?: View.inflate(this@MainActivity, R.layout.item_content, null)
+                view.tag = item.id // 保存ID，打开子串列表时用
                 view.text_user_id.text = item.userid
                 view.text_id.text = item.recodeId
                 view.text_now.text = item.recodeNow
                 view.text_content.text = Html.fromHtml(item.content)
+                item.bindThumb(view.image)
+                view.image.tag = item.imageUrl // 保存大图链接，展示大图时用
+                view.image.setOnClickListener(imageClickListener)
                 return view
             }
         }
@@ -179,27 +199,27 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     /**
      * 加载串列表
      */
+    @UiThread
     private fun loadThread(refresh: Boolean = false) {
         if (mLoading) return
         mLoading = true
+        thread_srl.isRefreshing = true
         if (refresh) mCurrentPage = 1 else mCurrentPage++
         DataClient.listThread(mCurrentForumId, mCurrentPage) {
-            mLoading = false
             thread_srl.isRefreshing = false
             if (it.success) {
                 thread_main.hideError()
-                if (it.data!!.isEmpty()) {
-                    MessageUtils.showToast(this@MainActivity, "无更多数据")
-                    return@listThread
+                if (!it.data!!.isEmpty()) {
+                    if (refresh) mThreadList.clear()
+                    mThreadList.addAll(mThreadList.size, it.data)
+                    (thread_list.adapter as BaseAdapter).notifyDataSetChanged()
                 }
-                if (refresh) mThreadList.clear()
-                mThreadList.addAll(mThreadList.size, it.data)
-                thread_list.requestLayout()
             } else {
-                thread_main.showError(it.message!!){
+                thread_main.showError(it.message!!) {
                     loadThread(true)
                 }
             }
+            mLoading = false
         }
     }
 

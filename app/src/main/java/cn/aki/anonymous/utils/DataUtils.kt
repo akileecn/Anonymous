@@ -1,6 +1,5 @@
 package cn.aki.anonymous.utils
 
-import android.util.Log
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -31,10 +30,7 @@ object DataUtils {
         val nowDate = parser.parse(parseNow)
         val diff = System.currentTimeMillis() - nowDate.time
         return when {
-            diff < MIN -> {
-                Log.e("time", "$parseNow ${System.currentTimeMillis()} ${nowDate.time} ");
-                "刚刚"
-            }
+            diff < MIN -> "刚刚"
             diff < HOUR -> (diff / MIN).toString() + "分钟前"
             diff < DAY -> (diff / HOUR).toString() + "小时前"
             diff < DAY * 2 -> "昨天"
@@ -44,7 +40,7 @@ object DataUtils {
         }
     }
 
-    fun recodeId(id: String): String {
+    fun recodeId(id: Int): String {
         return "No.$id"
     }
 

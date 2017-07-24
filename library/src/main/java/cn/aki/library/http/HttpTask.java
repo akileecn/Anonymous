@@ -26,7 +26,7 @@ public abstract class HttpTask<T> {
                 .build();
     }
 
-    HttpTask(String url) {
+    protected HttpTask(String url) {
         this.url = url;
     }
 

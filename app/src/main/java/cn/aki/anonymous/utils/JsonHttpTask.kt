@@ -4,6 +4,7 @@ import android.os.AsyncTask
 import android.util.Log
 import com.alibaba.fastjson.JSONException
 import com.google.common.base.Throwables
+import okhttp3.HttpUrl
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import java.io.IOException
@@ -12,10 +13,15 @@ import java.io.IOException
  * Created by Administrator on 2017/7/20.
  * json网络请求
  */
-open class JsonHttpTask(val request: Request, val callback: ((Result<String>) -> Unit)? = null):AsyncTask<Any, Void, Result<String>>(){
+open class JsonHttpTask(var request: Request? = null, val callback: ((Result<String>) -> Unit)? = null):AsyncTask<Any, Void, Result<String>>(){
     companion object {
         val httpClient = OkHttpClient()
         val tag = JsonHttpTask::class.java.simpleName!!
+    }
+
+    public constructor(url: String, callback: ((Result<String>) -> Unit)? = null) : this(null, callback) {
+        val request = Request.Builder().url(url).build()
+        this.request = request
     }
 
     override fun doInBackground(vararg params: Any?): Result<String> {

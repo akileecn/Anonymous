@@ -1,6 +1,5 @@
 package cn.aki.anonymous.dao
 
-import cn.aki.anonymous.entity.Post
 import cn.aki.anonymous.entity.PostThread
 import cn.aki.anonymous.utils.C
 import cn.aki.anonymous.utils.JsonHttpTask
@@ -26,8 +25,7 @@ class PostDao {
     }
 
     fun listPost(threadId: Int, page: Int, callback: (result: Result<PostThread>) -> Unit){
-        val request = Request.Builder().url(C.Api.createUrl(C.Api.POST_LIST, threadId, page)).build()
-        JsonHttpTask(request) {
+        JsonHttpTask(C.Api.createUrl(C.Api.POST_LIST, threadId, page)) {
             if (it.success) {
                 val threads = JSON.parseObject(it.data, PostThread::class.java)
                 callback(Result.success(threads))

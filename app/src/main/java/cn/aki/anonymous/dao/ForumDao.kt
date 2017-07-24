@@ -8,7 +8,6 @@ import cn.aki.anonymous.utils.C
 import cn.aki.anonymous.utils.JsonHttpTask
 import cn.aki.anonymous.utils.Result
 import com.alibaba.fastjson.JSON
-import okhttp3.Request
 
 /**
  * Created by Administrator on 2017/7/18.
@@ -45,8 +44,7 @@ class ForumDao(context: Context) {
      * 初始化数据库数据
      */
     private fun init(callback: (result: Result<List<Forum>>) -> Unit) {
-        val request = Request.Builder().url(C.Api.FORUM_LIST).build()
-        JsonHttpTask(request) {
+        JsonHttpTask(C.Api.FORUM_LIST) {
             if (it.success) {
                 val listDto = JSON.parseObject(it.data, ForumListDto::class.java)
                 if (!listDto.success || listDto.forum == null) {

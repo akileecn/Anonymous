@@ -1,13 +1,16 @@
 package cn.aki.anonymous.activity
 
+import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.support.annotation.UiThread
 import android.support.design.widget.NavigationView
 import android.support.v4.view.GravityCompat
 import android.support.v7.app.ActionBarDrawerToggle
+import android.support.v7.app.AlertDialog
 import android.support.v7.app.AppCompatActivity
 import android.text.Html
+import android.text.method.LinkMovementMethod
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
@@ -17,14 +20,14 @@ import android.widget.BaseAdapter
 import android.widget.TextView
 import cn.aki.anonymous.R
 import cn.aki.anonymous.entity.Forum
+import cn.aki.anonymous.entity.Notice
 import cn.aki.anonymous.entity.PostThread
-import cn.aki.anonymous.utils.C
-import cn.aki.anonymous.utils.DataClient
-import cn.aki.anonymous.utils.MessageUtils
-import cn.aki.anonymous.utils.MyBaseAdapter
+import cn.aki.anonymous.utils.*
+import com.alibaba.fastjson.JSON
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.app_bar_main.*
 import kotlinx.android.synthetic.main.content_main.*
+import kotlinx.android.synthetic.main.dialog_notice.view.*
 import kotlinx.android.synthetic.main.item_content.view.*
 
 class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelectedListener {
@@ -32,6 +35,8 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     @Volatile private var mLoading: Boolean = false // 是否正在加载
     private var mCurrentPage: Int = 0 // 当前页数
     private var mThreadList = mutableListOf<PostThread>()
+    private var mMenuItemRefresh: MenuItem? = null // 菜单刷新键
+    private var mMenuItemEditForum: MenuItem? = null // 编辑版块
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -48,23 +53,29 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         }
     }
 
+    // 加载action bar菜单
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
-        // Inflate the menu; this adds items to the action bar if it is present.
         menuInflater.inflate(R.menu.main, menu)
+        mMenuItemRefresh = menu.findItem(R.id.menu_item_refresh)
+        mMenuItemEditForum = menu.findItem(R.id.menu_item_edit_forum)
+        mMenuItemEditForum!!.isVisible = false
         return true
     }
 
+    // 绑定菜单按钮事件
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        val id = item.itemId
-
-
-        if (id == R.id.action_settings) {
-            return true
+        when(item.itemId){
+            // 刷新
+            R.id.menu_item_refresh -> {
+                loadThread(true)
+                return true
+            }
+            // 编辑版块
+            R.id.menu_item_edit_forum -> {
+                startActivity(Intent(this, EditForumActivity::class.java))
+                return true
+            }
         }
-
         return super.onOptionsItemSelected(item)
     }
 
@@ -101,6 +112,22 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         toggle.syncState()
         nav_view.setNavigationItemSelectedListener(this)
 
+        // 隐藏刷新菜单
+        content_dl.addDrawerListener(object : ActionBarDrawerToggle(this, main_layout,
+                R.string.navigation_drawer_open,
+                R.string.navigation_drawer_close) {
+            override fun onDrawerClosed(drawerView: View?) {
+                super.onDrawerClosed(drawerView)
+                mMenuItemRefresh!!.isVisible = true
+                mMenuItemEditForum!!.isVisible = false
+            }
+
+            override fun onDrawerOpened(drawerView: View?) {
+                super.onDrawerOpened(drawerView)
+                mMenuItemRefresh!!.isVisible = false
+                mMenuItemEditForum!!.isVisible = true
+            }
+        })
     }
 
     /**
@@ -147,6 +174,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
      * 初始化数据
      */
     private fun initData() {
+        loadNotice()
         loadForum()
         // 打开图片展示页面
         val imageClickListener = ImageActivity.OpenOnClickListener(this)
@@ -213,6 +241,8 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                     if (refresh) mThreadList.clear()
                     mThreadList.addAll(mThreadList.size, it.data)
                     (thread_list.adapter as BaseAdapter).notifyDataSetChanged()
+                    // 在notifyDataSetChanged之后调用
+                    if (refresh) thread_list.setSelection(0)
                 }
             } else {
                 thread_main.showError(it.message!!) {
@@ -223,4 +253,30 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         }
     }
 
+    /**
+     * 加载通知
+     */
+    private fun loadNotice() {
+        JsonHttpTask(C.Api.NOTICE) {
+            if (it.success) {
+                val notice = JSON.parseObject(it.data, Notice::class.java)
+                val mSp = getSharedPreferences(C.SP.NAME, Context.MODE_PRIVATE)
+                val timestamp = mSp.getLong(C.SP.NOTICE_TIMESTAMP, 0L)
+                if (notice.date != timestamp) {
+                    val view = View.inflate(this, R.layout.dialog_notice, null)
+                    view.text_notice.text = Html.fromHtml(notice.content)
+                    // text中的链接可点击
+                    view.text_notice.movementMethod = LinkMovementMethod.getInstance()
+                    val dialog = AlertDialog.Builder(this).setView(view).setTitle("通知").create()
+                    view.btn_sure.setOnClickListener {
+                        if (view.cb_known.isChecked) {
+                            mSp.edit().putLong(C.SP.NOTICE_TIMESTAMP, notice.date).apply()
+                        }
+                        dialog.hide()
+                    }
+                    dialog.show()
+                }
+            }
+        }.execute()
+    }
 }

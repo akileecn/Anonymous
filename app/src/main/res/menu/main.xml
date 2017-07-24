@@ -2,8 +2,15 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
     <item
-        android:id="@+id/action_settings"
-        android:orderInCategory="100"
-        android:title="@string/action_settings"
-        app:showAsAction="never" />
+        android:id="@+id/menu_item_refresh"
+        android:orderInCategory="2"
+        android:icon="@android:drawable/ic_popup_sync"
+        android:title="刷新"
+        app:showAsAction="ifRoom" />
+    <item
+        android:id="@+id/menu_item_edit_forum"
+        android:icon="@android:drawable/ic_menu_sort_by_size"
+        android:orderInCategory="1"
+        android:title="排版"
+        app:showAsAction="ifRoom" />
 </menu>

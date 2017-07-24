@@ -6,7 +6,8 @@ package cn.aki.anonymous.utils
  */
 object C {
     object Api{
-        const val FORUM_LIST = "http://cover.acfunwiki.org/cn.json" //
+        const val FORUM_LIST = "http://cover.acfunwiki.org/cn.json" // 版块列表
+        const val NOTICE = "http://cover.acfunwiki.org/nmb-notice.json" // 通知
         // https://h.nimingban.com/Api/showf?appid=nimingban&id=4&page=1
 //        const val DOMAIN = "https://h.nimingban.com"
         private const val DOMAIN = "http://h.adnmb.com"
@@ -37,6 +38,7 @@ object C {
     object SP{
         const val NAME = "anonymous"
         const val FORUM_DB_INIT = "FORUM_DB_INT" // 版块列表数据库是否初始化
+        const val NOTICE_TIMESTAMP = "NOTICE_TIMESTAMP" // 公告时间戳
     }
     // intent extra key
     object Extra{

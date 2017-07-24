@@ -29,6 +29,8 @@
         <activity android:name=".activity.ImageActivity" />
         <!-- 子串列表 -->
         <activity android:name=".activity.ThreadActivity" />
+        <!-- 版块编辑 -->
+        <activity android:name=".activity.EditForumActivity" />
     </application>
 
 </manifest>

@@ -7,7 +7,7 @@ import android.support.v7.app.AppCompatActivity
 import android.view.MenuItem
 import android.view.View
 import cn.aki.anonymous.R
-import cn.aki.anonymous.utils.C
+import cn.aki.anonymous.base.C
 import cn.aki.library.utils.ImageUtils
 import kotlinx.android.synthetic.main.activity_image.*
 

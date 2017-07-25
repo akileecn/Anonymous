@@ -46,10 +46,9 @@ object DataUtils {
 
     fun unicode2string(unicode: String): String {
         val sb = StringBuilder()
-        var pos = 0
         var i = unicode.indexOf("\\u")
+        var pos = i
         while(i != -1){
-            sb.append(unicode.substring(pos, i))
             if (i + 5 < unicode.length) {
                 pos = i + 6
                 sb.append(Integer.parseInt(unicode.substring(i + 2, i + 6), 16).toChar())

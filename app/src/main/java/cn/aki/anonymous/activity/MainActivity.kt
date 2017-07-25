@@ -1,5 +1,6 @@
 package cn.aki.anonymous.activity
 
+import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
@@ -19,10 +20,15 @@ import android.widget.AbsListView
 import android.widget.BaseAdapter
 import android.widget.TextView
 import cn.aki.anonymous.R
+import cn.aki.anonymous.base.JsonHttpTask
+import cn.aki.anonymous.base.MyBaseAdapter
+import cn.aki.anonymous.dao.ForumDao
+import cn.aki.anonymous.dao.PostDao
 import cn.aki.anonymous.entity.Forum
 import cn.aki.anonymous.entity.Notice
 import cn.aki.anonymous.entity.PostThread
-import cn.aki.anonymous.utils.*
+import cn.aki.anonymous.base.C
+import cn.aki.anonymous.utils.MessageUtils
 import com.alibaba.fastjson.JSON
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.app_bar_main.*
@@ -37,12 +43,22 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     private var mThreadList = mutableListOf<PostThread>()
     private var mMenuItemRefresh: MenuItem? = null // 菜单刷新键
     private var mMenuItemEditForum: MenuItem? = null // 编辑版块
+    private val mForumDao: ForumDao = ForumDao(this)
+    private val mPostDao = PostDao()
+    private val REQUEST_CODE_EDIT_FORUM = 1
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         initView()
         initListener()
         initData()
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        if (requestCode == REQUEST_CODE_EDIT_FORUM && resultCode == Activity.RESULT_OK) {
+            loadForum()
+        }
     }
 
     override fun onBackPressed() {
@@ -64,15 +80,15 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
     // 绑定菜单按钮事件
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        when(item.itemId){
-            // 刷新
+        when (item.itemId) {
+        // 刷新
             R.id.menu_item_refresh -> {
                 loadThread(true)
                 return true
             }
-            // 编辑版块
+        // 编辑版块
             R.id.menu_item_edit_forum -> {
-                startActivity(Intent(this, EditForumActivity::class.java))
+                startActivityForResult(Intent(this, EditForumActivity::class.java), REQUEST_CODE_EDIT_FORUM)
                 return true
             }
         }
@@ -140,6 +156,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             content_dl.closeDrawer(GravityCompat.END)
             if (forum.id != mCurrentForumId) {
                 mCurrentForumId = forum.id
+                toolbar.title = forum.name
                 loadThread(true)
             }
         }
@@ -199,7 +216,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
      * 加载版块列表
      */
     private fun loadForum() {
-        DataClient.listForum {
+        mForumDao.list {
             if (it.success) {
                 forum_list.adapter = object : MyBaseAdapter<Forum>(it.data!!) {
                     override fun getView(position: Int, convertView: View?, parent: ViewGroup?): View {
@@ -210,14 +227,8 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                         return view
                     }
                 }
-                for (item in it.data) {
-                    // 加载第一个非时间线版块
-                    if (item.id != -1) {
-                        mCurrentForumId = item.id
-                        loadThread()
-                        break
-                    }
-                }
+                mCurrentForumId = it.data[0].id
+                loadThread()
             } else {
                 MessageUtils.showToast(this@MainActivity, it.message!!)
             }
@@ -233,7 +244,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         mLoading = true
         thread_srl.isRefreshing = true
         if (refresh) mCurrentPage = 1 else mCurrentPage++
-        DataClient.listThread(mCurrentForumId, mCurrentPage) {
+        mPostDao.listThread(mCurrentForumId, mCurrentPage) {
             thread_srl.isRefreshing = false
             if (it.success) {
                 thread_main.hideError()

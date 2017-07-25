@@ -9,18 +9,19 @@ import android.view.ViewGroup
 import android.widget.AbsListView
 import android.widget.BaseAdapter
 import cn.aki.anonymous.R
+import cn.aki.anonymous.base.MyBaseAdapter
+import cn.aki.anonymous.dao.PostDao
 import cn.aki.anonymous.entity.Post
-import cn.aki.anonymous.utils.C
-import cn.aki.anonymous.utils.DataClient
-import cn.aki.anonymous.utils.MyBaseAdapter
+import cn.aki.anonymous.base.C
 import kotlinx.android.synthetic.main.activity_thread.*
 import kotlinx.android.synthetic.main.item_content.view.*
 
 class ThreadActivity : AppCompatActivity() {
     @Volatile private var mLoading: Boolean = false // 是否正在加载
     private var mCurrentPage: Int = 0 // 当前页数
-    private var mPostList = mutableListOf<Post>()
+    private val mPostList = mutableListOf<Post>()
     private var mThreadId: Int = 0 // 当前串号
+    private val mPostDao = PostDao()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -29,7 +30,7 @@ class ThreadActivity : AppCompatActivity() {
         initData()
     }
 
-    fun initListener(){
+    fun initListener() {
         // 下拉刷新
         thread_srl.setOnRefreshListener {
             loadPost(true)
@@ -50,7 +51,7 @@ class ThreadActivity : AppCompatActivity() {
         })
     }
 
-    fun initData(){
+    fun initData() {
         mThreadId = intent.getIntExtra(C.Extra.THREAD_ID, 0)
         val imageClickListener = ImageActivity.OpenOnClickListener(this)
         post_list.adapter = object : MyBaseAdapter<Post>(mPostList) {
@@ -79,7 +80,7 @@ class ThreadActivity : AppCompatActivity() {
         mLoading = true
         thread_srl.isRefreshing = true
         if (refresh) mCurrentPage = 1 else mCurrentPage++
-        DataClient.listPost(mThreadId, mCurrentPage) {
+        mPostDao.listPost(mThreadId, mCurrentPage) {
             thread_srl.isRefreshing = false
             if (it.success) {
                 thread_main.hideError()

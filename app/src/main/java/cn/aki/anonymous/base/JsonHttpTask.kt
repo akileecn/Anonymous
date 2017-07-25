@@ -1,10 +1,10 @@
-package cn.aki.anonymous.utils
+package cn.aki.anonymous.base
 
 import android.os.AsyncTask
 import android.util.Log
+import cn.aki.anonymous.utils.DataUtils
 import com.alibaba.fastjson.JSONException
 import com.google.common.base.Throwables
-import okhttp3.HttpUrl
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import java.io.IOException
@@ -19,7 +19,7 @@ open class JsonHttpTask(var request: Request? = null, val callback: ((Result<Str
         val tag = JsonHttpTask::class.java.simpleName!!
     }
 
-    public constructor(url: String, callback: ((Result<String>) -> Unit)? = null) : this(null, callback) {
+    constructor(url: String, callback: ((Result<String>) -> Unit)? = null) : this(null, callback) {
         val request = Request.Builder().url(url).build()
         this.request = request
     }

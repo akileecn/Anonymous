@@ -2,7 +2,7 @@ package cn.aki.anonymous.entity
 
 import android.text.TextUtils
 import android.widget.ImageView
-import cn.aki.anonymous.utils.C
+import cn.aki.anonymous.base.C
 import cn.aki.anonymous.utils.DataUtils
 import cn.aki.library.utils.ImageUtils
 

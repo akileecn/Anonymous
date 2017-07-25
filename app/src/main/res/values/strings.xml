@@ -5,4 +5,8 @@
     <string name="navigation_drawer_close">Close navigation drawer</string>
 
     <string name="action_settings">Settings</string>
+    <string name="sure">确定</string>
+    <string name="order">排序</string>
+    <string name="id">ID</string>
+    <string name="name">名称</string>
 </resources>

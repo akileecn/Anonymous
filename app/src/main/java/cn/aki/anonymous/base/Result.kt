@@ -1,4 +1,4 @@
-package cn.aki.anonymous.utils
+package cn.aki.anonymous.base
 
 /**
  * Created by Administrator on 2017/7/20.
@@ -9,11 +9,11 @@ open class Result<out T>(
         val data: T?,
         val message: String?){
     companion object {
-        fun <T> success(data: T?): Result<T>{
+        fun <T> success(data: T?): Result<T> {
             return Result(true, data, null)
         }
 
-        fun <T> fail(message: String? = "A岛完了"): Result<T>{
+        fun <T> fail(message: String? = "A岛完了"): Result<T> {
             return Result(false, null, message)
         }
     }

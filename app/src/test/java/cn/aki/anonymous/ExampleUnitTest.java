@@ -1,18 +1,8 @@
 package cn.aki.anonymous;
 
-import android.util.Log;
-
-import com.alibaba.fastjson.JSON;
-
 import org.junit.Test;
 
-import java.util.Date;
-
-import cn.aki.anonymous.utils.C;
 import cn.aki.anonymous.utils.DataUtils;
-import okhttp3.OkHttpClient;
-import okhttp3.Request;
-import okhttp3.Response;
 
 /**
  * Example local unit test, which will execute on the development machine (host).

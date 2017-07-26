@@ -3,16 +3,16 @@ package cn.aki.anonymous.activity
 import android.os.Bundle
 import android.support.annotation.UiThread
 import android.support.v7.app.AppCompatActivity
-import android.text.Html
 import android.view.View
 import android.view.ViewGroup
 import android.widget.AbsListView
 import android.widget.BaseAdapter
 import cn.aki.anonymous.R
+import cn.aki.anonymous.base.C
 import cn.aki.anonymous.base.MyBaseAdapter
 import cn.aki.anonymous.dao.PostDao
 import cn.aki.anonymous.entity.Post
-import cn.aki.anonymous.base.C
+import cn.aki.anonymous.utils.DataUtils
 import kotlinx.android.synthetic.main.activity_thread.*
 import kotlinx.android.synthetic.main.item_post.view.*
 
@@ -61,7 +61,7 @@ class ThreadActivity : AppCompatActivity() {
                 view.text_user_id.text = item.userid
                 view.text_id.text = item.recodeId
                 view.text_now.text = item.recodeNow
-                view.text_content.text = Html.fromHtml(item.content)
+                view.text_content.text = DataUtils.fromHtml(item.content)
                 item.bindThumb(view.image)
                 view.image.tag = item.imageUrl
                 view.image.setOnClickListener(imageClickListener)

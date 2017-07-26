@@ -10,6 +10,7 @@ import android.widget.ViewSwitcher
 import cn.aki.anonymous.R
 import cn.aki.anonymous.entity.Post
 import cn.aki.anonymous.utils.DataUtils
+import java.util.*
 
 /**
  * Created by Administrator on 2017/7/26.
@@ -20,12 +21,8 @@ class TimerTextSwitcher : TextSwitcher, ViewSwitcher.ViewFactory {
     private var mCurrentPos = 0
     private var mHandler = Handler()
     private val mShowNextTask = Runnable {
-        setText(DataUtils.fromHtml(mPosts[mCurrentPos].content))
+        setText(DataUtils.fromHtml(mPosts[mCurrentPos].content, DataUtils.FLAG_HANDLE_BR))
         delayShowNext()
-    }
-
-    companion object {
-        private val DELAY_MILLIS = 5_000L
     }
 
     constructor(context: Context) : super(context)
@@ -50,7 +47,7 @@ class TimerTextSwitcher : TextSwitcher, ViewSwitcher.ViewFactory {
             setCurrentText("")
             return
         }
-        setCurrentText(DataUtils.fromHtml(mPosts[0].content))
+        setCurrentText(DataUtils.fromHtml(mPosts[0].content, DataUtils.FLAG_HANDLE_BR))
         delayShowNext()
     }
 
@@ -66,7 +63,8 @@ class TimerTextSwitcher : TextSwitcher, ViewSwitcher.ViewFactory {
         } else {
             mCurrentPos = 0
         }
-        mHandler.postDelayed(mShowNextTask, DELAY_MILLIS)
+        // 随机延迟
+        mHandler.postDelayed(mShowNextTask, (3000L + Random().nextInt(2000)))
     }
 
 }

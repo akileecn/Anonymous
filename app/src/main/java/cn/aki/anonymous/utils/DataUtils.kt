@@ -8,6 +8,7 @@ import android.util.Log
 import org.xml.sax.XMLReader
 import java.text.SimpleDateFormat
 import java.util.*
+import java.util.regex.Pattern
 
 
 /**
@@ -23,10 +24,14 @@ object DataUtils {
     private const val DAY = 24 * HOUR
     private const val WEEK = 7 * DAY
     private const val YEAR = 356 * DAY
+    private const val PATTERN_POST_ID = "&gt;&gt;(No\\.)?\\d+" // 串ID正则
+    private const val PATTERN_BR = "<br ?/?>" // 回车正则
+    const val FLAG_HANDLE_BR = 0x0001
+    const val FLAG_HANDLE_POST_ID = 0x0001.shl(1)
 
     private val mTagHandler = object: Html.TagHandler{
         override fun handleTag(opening: Boolean, tag: String?, output: Editable?, xmlReader: XMLReader?) {
-            TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+            //TODO
         }
 
         private fun <T> getLast(text: Spanned, kind: Class<T>): T? {
@@ -92,13 +97,41 @@ object DataUtils {
         return sb.toString()
     }
 
+    fun fromHtml(html: String): Spanned{
+        return fromHtml(html, FLAG_HANDLE_POST_ID)
+    }
+
     @Suppress("DEPRECATION")
-    fun fromHtml(html: String): Spanned {
+    fun fromHtml(html: String, flag: Int): Spanned {
+        var handledHtml = if(flag and FLAG_HANDLE_BR != 0) handleBr(html) else html
+        handledHtml = if(flag and FLAG_HANDLE_POST_ID != 0) handlePostId(handledHtml) else handledHtml
         if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.N){
-            return Html.fromHtml(html, Html.FROM_HTML_MODE_LEGACY, null, mTagHandler)
+            return Html.fromHtml(handledHtml, Html.FROM_HTML_MODE_LEGACY, null, mTagHandler)
         }else{
-            return Html.fromHtml(html, null, mTagHandler)
+            return Html.fromHtml(handledHtml, null, mTagHandler)
         }
+    }
+
+    /**
+     * 处理串号
+     */
+    private fun handlePostId(html: String): String{
+        val matcher = Pattern.compile(PATTERN_POST_ID).matcher(html)
+        val sb = StringBuilder()
+        var end = 0
+        while (matcher.find()) {
+            sb.append(html.substring(end, matcher.start())).append("<font color='#789922'>").append(matcher.group()).append("</font>")
+            end = matcher.end()
+        }
+        sb.append(html.substring(end))
+        return sb.toString()
+    }
+
+    /**
+     * 处理换行
+     */
+    private fun handleBr(html: String): String{
+        return Pattern.compile(PATTERN_BR).matcher(html).replaceAll(" ")
     }
 
 }

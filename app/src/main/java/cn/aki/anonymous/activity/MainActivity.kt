@@ -10,13 +10,16 @@ import android.support.v4.view.GravityCompat
 import android.support.v7.app.ActionBarDrawerToggle
 import android.support.v7.app.AlertDialog
 import android.support.v7.app.AppCompatActivity
-import android.text.Html
 import android.text.method.LinkMovementMethod
-import android.view.*
+import android.view.Menu
+import android.view.MenuItem
+import android.view.View
+import android.view.ViewGroup
 import android.widget.AbsListView
 import android.widget.BaseAdapter
 import android.widget.TextView
 import cn.aki.anonymous.R
+import cn.aki.anonymous.base.C
 import cn.aki.anonymous.base.JsonHttpTask
 import cn.aki.anonymous.base.MyBaseAdapter
 import cn.aki.anonymous.dao.ForumDao
@@ -24,7 +27,7 @@ import cn.aki.anonymous.dao.PostDao
 import cn.aki.anonymous.entity.Forum
 import cn.aki.anonymous.entity.Notice
 import cn.aki.anonymous.entity.PostThread
-import cn.aki.anonymous.base.C
+import cn.aki.anonymous.utils.DataUtils
 import cn.aki.anonymous.utils.MessageUtils
 import com.alibaba.fastjson.JSON
 import kotlinx.android.synthetic.main.activity_main.*
@@ -200,7 +203,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                 view.text_user_id.text = item.userid
                 view.text_id.text = item.recodeId
                 view.text_now.text = item.recodeNow
-                view.text_content.text = Html.fromHtml(item.content)
+                view.text_content.text = DataUtils.fromHtml(item.content)
                 item.bindThumb(view.image)
                 view.image.tag = item.imageUrl // 保存大图链接，展示大图时用
                 view.image.setOnClickListener(imageClickListener)
@@ -274,7 +277,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                 val timestamp = mSp.getLong(C.SP.NOTICE_TIMESTAMP, 0L)
                 if (notice.date != timestamp) {
                     val view = View.inflate(this, R.layout.dialog_notice, null)
-                    view.text_notice.text = Html.fromHtml(notice.content)
+                    view.text_notice.text = DataUtils.fromHtml(notice.content)
                     // text中的链接可点击
                     view.text_notice.movementMethod = LinkMovementMethod.getInstance()
                     val dialog = AlertDialog.Builder(this).setView(view).setTitle("通知").create()

@@ -4,6 +4,7 @@ import android.content.Context;
 import android.provider.Settings;
 import android.support.test.InstrumentationRegistry;
 import android.support.test.runner.AndroidJUnit4;
+import android.text.Spanned;
 import android.text.format.DateUtils;
 import android.util.Log;
 
@@ -29,5 +30,10 @@ public class ExampleInstrumentedTest {
         Context appContext = InstrumentationRegistry.getTargetContext();
 
         assertEquals("cn.aki.anonymous", appContext.getPackageName());
+
+        String html = "&gt;&gt;No.159181<br />⊂彡☆))∀`)";
+        Spanned spanned = DataUtils.INSTANCE.fromHtml(html);
+        System.err.println(spanned);
+
     }
 }

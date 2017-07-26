@@ -1,5 +1,11 @@
 package cn.aki.anonymous.utils
 
+import android.os.Build
+import android.text.Editable
+import android.text.Html
+import android.text.Spanned
+import android.util.Log
+import org.xml.sax.XMLReader
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -18,6 +24,25 @@ object DataUtils {
     private const val WEEK = 7 * DAY
     private const val YEAR = 356 * DAY
 
+    private val mTagHandler = object: Html.TagHandler{
+        override fun handleTag(opening: Boolean, tag: String?, output: Editable?, xmlReader: XMLReader?) {
+            TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        }
+
+        private fun <T> getLast(text: Spanned, kind: Class<T>): T? {
+            /*
+             * This knows that the last returned object from getSpans()
+             * will be the most recently added.
+             */
+            val objs = text.getSpans(0, text.length, kind)
+            if (objs.isEmpty()) {
+                return null
+            } else {
+                return objs[objs.size - 1]
+            }
+        }
+    }
+
     init {
         val timeZone = TimeZone.getTimeZone("GMT+08:00")
         parser.timeZone = timeZone
@@ -25,6 +50,9 @@ object DataUtils {
         formatYear.timeZone = timeZone
     }
 
+    /**
+     * 转译post.now字段
+     */
     fun recodeNow(now: String): String {
         val parseNow = now.substring(0, 10) + now.substring(13)
         val nowDate = parser.parse(parseNow)
@@ -40,10 +68,16 @@ object DataUtils {
         }
     }
 
+    /**
+     * 转译post.id字段
+     */
     fun recodeId(id: Int): String {
         return "No.$id"
     }
 
+    /**
+     * unicode转码
+     */
     fun unicode2string(unicode: String): String {
         val sb = StringBuilder()
         var i = unicode.indexOf("\\u")
@@ -56,6 +90,15 @@ object DataUtils {
             i = unicode.indexOf("\\u", pos)
         }
         return sb.toString()
+    }
+
+    @Suppress("DEPRECATION")
+    fun fromHtml(html: String): Spanned {
+        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.N){
+            return Html.fromHtml(html, Html.FROM_HTML_MODE_LEGACY, null, mTagHandler)
+        }else{
+            return Html.fromHtml(html, null, mTagHandler)
+        }
     }
 
 }

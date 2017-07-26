@@ -12,10 +12,7 @@ import android.support.v7.app.AlertDialog
 import android.support.v7.app.AppCompatActivity
 import android.text.Html
 import android.text.method.LinkMovementMethod
-import android.view.Menu
-import android.view.MenuItem
-import android.view.View
-import android.view.ViewGroup
+import android.view.*
 import android.widget.AbsListView
 import android.widget.BaseAdapter
 import android.widget.TextView
@@ -34,7 +31,7 @@ import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.app_bar_main.*
 import kotlinx.android.synthetic.main.content_main.*
 import kotlinx.android.synthetic.main.dialog_notice.view.*
-import kotlinx.android.synthetic.main.item_content.view.*
+import kotlinx.android.synthetic.main.item_thread.view.*
 
 class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelectedListener {
     private var mCurrentForumId: Int = 0 // 当前版块ID
@@ -198,7 +195,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         thread_list.adapter = object : MyBaseAdapter<PostThread>(mThreadList) {
             override fun getView(position: Int, convertView: View?, parent: ViewGroup?): View {
                 val item = getItem(position)
-                val view = convertView ?: View.inflate(this@MainActivity, R.layout.item_content, null)
+                val view = convertView ?: View.inflate(this@MainActivity, R.layout.item_thread, null)
                 view.tag = item.id // 保存ID，打开子串列表时用
                 view.text_user_id.text = item.userid
                 view.text_id.text = item.recodeId
@@ -207,6 +204,8 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                 item.bindThumb(view.image)
                 view.image.tag = item.imageUrl // 保存大图链接，展示大图时用
                 view.image.setOnClickListener(imageClickListener)
+                view.text_reply_count.text = "${item.replyCount} ${resources.getString(R.string.replay)}"
+                view.text_switcher_replay.initByPosts(item.replys)
                 return view
             }
         }

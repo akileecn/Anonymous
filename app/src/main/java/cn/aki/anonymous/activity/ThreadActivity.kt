@@ -14,7 +14,7 @@ import cn.aki.anonymous.dao.PostDao
 import cn.aki.anonymous.entity.Post
 import cn.aki.anonymous.base.C
 import kotlinx.android.synthetic.main.activity_thread.*
-import kotlinx.android.synthetic.main.item_content.view.*
+import kotlinx.android.synthetic.main.item_post.view.*
 
 class ThreadActivity : AppCompatActivity() {
     @Volatile private var mLoading: Boolean = false // 是否正在加载

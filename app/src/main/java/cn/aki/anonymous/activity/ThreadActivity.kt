@@ -3,6 +3,7 @@ package cn.aki.anonymous.activity
 import android.os.Bundle
 import android.support.annotation.UiThread
 import android.support.v7.app.AppCompatActivity
+import android.text.method.LinkMovementMethod
 import android.view.View
 import android.view.ViewGroup
 import android.widget.AbsListView
@@ -62,6 +63,8 @@ class ThreadActivity : AppCompatActivity() {
                 view.text_id.text = item.recodeId
                 view.text_now.text = item.recodeNow
                 view.text_content.text = DataUtils.fromHtml(item.content)
+                // text中的链接可点击
+                view.text_content.movementMethod = LinkMovementMethod.getInstance()
                 item.bindThumb(view.image)
                 view.image.tag = item.imageUrl
                 view.image.setOnClickListener(imageClickListener)

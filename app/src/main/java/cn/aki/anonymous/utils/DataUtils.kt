@@ -1,11 +1,11 @@
 package cn.aki.anonymous.utils
 
 import android.os.Build
-import android.text.Editable
 import android.text.Html
+import android.text.Spannable
+import android.text.SpannableString
 import android.text.Spanned
 import android.util.Log
-import org.xml.sax.XMLReader
 import java.text.SimpleDateFormat
 import java.util.*
 import java.util.regex.Pattern
@@ -24,29 +24,11 @@ object DataUtils {
     private const val DAY = 24 * HOUR
     private const val WEEK = 7 * DAY
     private const val YEAR = 356 * DAY
-    private const val PATTERN_POST_ID = "&gt;&gt;(No\\.)?\\d+" // 串ID正则
-    private const val PATTERN_BR = "<br ?/?>" // 回车正则
+    private val PATTERN_POST_ID = Pattern.compile(">>(No\\.)?\\d+") // 串ID正则
+    private val PATTERN_ID = Pattern.compile("\\d+")
+    private val PATTERN_BR = Pattern.compile("<br ?/?>") // 回车正则
     const val FLAG_HANDLE_BR = 0x0001
     const val FLAG_HANDLE_POST_ID = 0x0001.shl(1)
-
-    private val mTagHandler = object: Html.TagHandler{
-        override fun handleTag(opening: Boolean, tag: String?, output: Editable?, xmlReader: XMLReader?) {
-            //TODO
-        }
-
-        private fun <T> getLast(text: Spanned, kind: Class<T>): T? {
-            /*
-             * This knows that the last returned object from getSpans()
-             * will be the most recently added.
-             */
-            val objs = text.getSpans(0, text.length, kind)
-            if (objs.isEmpty()) {
-                return null
-            } else {
-                return objs[objs.size - 1]
-            }
-        }
-    }
 
     init {
         val timeZone = TimeZone.getTimeZone("GMT+08:00")
@@ -87,7 +69,7 @@ object DataUtils {
         val sb = StringBuilder()
         var i = unicode.indexOf("\\u")
         var pos = i
-        while(i != -1){
+        while (i != -1) {
             if (i + 5 < unicode.length) {
                 pos = i + 6
                 sb.append(Integer.parseInt(unicode.substring(i + 2, i + 6), 16).toChar())
@@ -97,41 +79,47 @@ object DataUtils {
         return sb.toString()
     }
 
-    fun fromHtml(html: String): Spanned{
+    fun fromHtml(html: String): Spanned {
         return fromHtml(html, FLAG_HANDLE_POST_ID)
     }
 
     @Suppress("DEPRECATION")
     fun fromHtml(html: String, flag: Int): Spanned {
-        var handledHtml = if(flag and FLAG_HANDLE_BR != 0) handleBr(html) else html
-        handledHtml = if(flag and FLAG_HANDLE_POST_ID != 0) handlePostId(handledHtml) else handledHtml
-        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.N){
-            return Html.fromHtml(handledHtml, Html.FROM_HTML_MODE_LEGACY, null, mTagHandler)
-        }else{
-            return Html.fromHtml(handledHtml, null, mTagHandler)
+        val handledHtml = if (flag and FLAG_HANDLE_BR != 0) handleBr(html) else html
+        var result: Spanned = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            Html.fromHtml(handledHtml, Html.FROM_HTML_MODE_LEGACY)
+        } else {
+            Html.fromHtml(handledHtml)
         }
+        if (flag and FLAG_HANDLE_POST_ID != 0) {
+            result = handlePostId(result)
+        }
+        Log.e("html", result.toString())
+        return result
     }
 
     /**
      * 处理串号
      */
-    private fun handlePostId(html: String): String{
-        val matcher = Pattern.compile(PATTERN_POST_ID).matcher(html)
-        val sb = StringBuilder()
-        var end = 0
+    private fun handlePostId(source: CharSequence): Spanned {
+        val matcher = PATTERN_POST_ID.matcher(source)
+        val spannable = source as? Spannable ?: SpannableString(source)
         while (matcher.find()) {
-            sb.append(html.substring(end, matcher.start())).append("<font color='#789922'>").append(matcher.group()).append("</font>")
-            end = matcher.end()
+            val postIdWord = matcher.group()
+            val matcher2 = PATTERN_ID.matcher(postIdWord)
+            if (matcher2.find()) {
+                val postId = matcher2.group()
+                spannable.setSpan(PostClickableSpan(postId), matcher.start(), matcher.end(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
+            }
         }
-        sb.append(html.substring(end))
-        return sb.toString()
+        return spannable
     }
 
     /**
      * 处理换行
      */
-    private fun handleBr(html: String): String{
-        return Pattern.compile(PATTERN_BR).matcher(html).replaceAll(" ")
+    private fun handleBr(html: String): String {
+        return PATTERN_BR.matcher(html).replaceAll(" ")
     }
 
 }

@@ -59,7 +59,7 @@ class ThreadActivity : AppCompatActivity() {
             override fun getView(position: Int, convertView: View?, parent: ViewGroup?): View {
                 val item = getItem(position)
                 val view = convertView ?: View.inflate(this@ThreadActivity, R.layout.item_post, null)
-                view.text_user_id.text = item.userid
+                view.text_user_id.text = item.recodeUserId
                 view.text_id.text = item.recodeId
                 view.text_now.text = item.recodeNow
                 view.text_content.text = DataUtils.fromHtml(item.content)

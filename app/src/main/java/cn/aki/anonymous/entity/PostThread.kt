@@ -5,6 +5,14 @@ package cn.aki.anonymous.entity
  * 串
  */
 class PostThread(
-        var replyCount: Int = 0,
-        var replys: List<Post> = listOf()
-) : Post()
+        var replyCount: Int = 0
+) : Post() {
+    var replys: List<Post> = listOf()
+        get() = field
+        set(value) {
+            field = value
+            value.forEach {
+                it.isPo = (it.userid == this@PostThread.userid)
+            }
+        }
+}

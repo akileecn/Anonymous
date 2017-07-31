@@ -200,7 +200,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                 val item = getItem(position)
                 val view = convertView ?: View.inflate(this@MainActivity, R.layout.item_thread, null)
                 view.tag = item.id // 保存ID，打开子串列表时用
-                view.text_user_id.text = item.userid
+                view.text_user_id.text = item.recodeUserId
                 view.text_id.text = item.recodeId
                 view.text_now.text = item.recodeNow
                 view.text_content.text = DataUtils.fromHtml(item.content)

@@ -21,12 +21,21 @@ open class Post(
         var title: String = "",
         var content: String = "",
         var sage: Boolean = false,
-        var admin: Boolean = false
+        var admin: Boolean = false,
+
+        var isPo: Boolean = false
 ) {
     val recodeNow: String
         get() = DataUtils.recodeNow(now)
     val recodeId: String
-        get() = DataUtils.recodeId(id)
+        get() = "No.$id"
+    val recodeUserId: CharSequence
+        get() {
+            var result:CharSequence = userid
+            if(admin) result = DataUtils.recodeAdminUserId(userid)
+            if(isPo) result = DataUtils.recodePoUserId(userid)
+            return result
+        }
 
     /**
      * 绑定缩略图

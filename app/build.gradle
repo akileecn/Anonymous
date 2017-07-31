@@ -40,6 +40,7 @@ dependencies {
     compile 'com.google.guava:guava:22.0-android'
     compile 'com.google.code.findbugs:jsr305:2.0.1'
     testCompile 'junit:junit:4.12'
+    compile group: 'org.jsoup', name: 'jsoup', version: '1.10.3' // html解析
 }
 repositories {
     mavenCentral()

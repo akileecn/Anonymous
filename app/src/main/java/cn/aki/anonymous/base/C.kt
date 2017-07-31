@@ -10,7 +10,7 @@ object C {
         const val NOTICE = "http://cover.acfunwiki.org/nmb-notice.json" // 通知
         // https://h.nimingban.com/Api/showf?appid=nimingban&id=4&page=1
 //        const val DOMAIN = "https://h.nimingban.com"
-        private const val DOMAIN = "http://h.adnmb.com"
+        private const val DOMAIN = "https://tnmb.org"
         const val THREAD_LIST = DOMAIN + "/Api/showf" // 串列表
         const val TIME_LINE = DOMAIN + "/Api/timeline"
         const val POST_LIST = DOMAIN + "/Api/thread"  // 回复列表
@@ -27,11 +27,11 @@ object C {
         }
 
         fun createImageUrl(img: String, ext: String): String{
-            return "${IMAGE_BASE}/$img$ext"
+            return "$IMAGE_BASE/$img$ext"
         }
 
         fun createThumbUrl(img: String, ext: String): String{
-            return "${THUMB_BASE}/$img$ext"
+            return "$THUMB_BASE/$img$ext"
         }
 
         // 备胎岛版块json

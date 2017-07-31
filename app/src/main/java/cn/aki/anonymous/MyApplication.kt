@@ -1,6 +1,7 @@
 package cn.aki.anonymous
 
 import android.app.Application
+import cn.aki.anonymous.utils.DataUtils
 import cn.aki.library.utils.ImageUtils
 
 /**
@@ -17,6 +18,7 @@ class MyApplication : Application() {
         System.setProperty("https.proxyPort", "8888")
         // 初始化工具类
         ImageUtils.init(this)
+        DataUtils.init(this)
     }
 
 }

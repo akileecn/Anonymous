@@ -1,11 +1,13 @@
 package cn.aki.anonymous.utils
 
+import android.content.Context
+import android.graphics.Color
 import android.os.Build
-import android.text.Html
-import android.text.Spannable
-import android.text.SpannableString
-import android.text.Spanned
+import android.text.*
+import android.text.style.ForegroundColorSpan
 import android.util.Log
+import cn.aki.anonymous.R
+import cn.aki.anonymous.view.PostClickableSpan
 import java.text.SimpleDateFormat
 import java.util.*
 import java.util.regex.Pattern
@@ -16,6 +18,7 @@ import java.util.regex.Pattern
  * 数据处理类
  */
 object DataUtils {
+    private var mContext: Context? = null
     private val parser = SimpleDateFormat("yyyy-MM-ddHH:mm:ss", Locale.getDefault())
     private val formatThisYear = SimpleDateFormat("MM月dd", Locale.getDefault())
     private val formatYear = SimpleDateFormat("yyyy MM月dd", Locale.getDefault())
@@ -37,6 +40,9 @@ object DataUtils {
         formatYear.timeZone = timeZone
     }
 
+    fun init(context: Context){
+        mContext = context
+    }
     /**
      * 转译post.now字段
      */
@@ -53,13 +59,6 @@ object DataUtils {
             diff < YEAR -> formatThisYear.format(nowDate)
             else -> formatYear.format(nowDate)
         }
-    }
-
-    /**
-     * 转译post.id字段
-     */
-    fun recodeId(id: Int): String {
-        return "No.$id"
     }
 
     /**
@@ -122,4 +121,17 @@ object DataUtils {
         return PATTERN_BR.matcher(html).replaceAll(" ")
     }
 
+    fun recodeAdminUserId(source: CharSequence): CharSequence{
+        val spannable = source as? Spannable ?: SpannableString(source)
+        spannable.setSpan(ForegroundColorSpan(Color.RED), 0, source.length, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
+        return spannable
+    }
+
+    fun recodePoUserId(source: CharSequence): CharSequence{
+        val spannable = source as? Spannable ?: SpannableString("(po)")
+        spannable.setSpan(ForegroundColorSpan(mContext!!.getColor(R.color.forgive)), 0, 4, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
+        val builder = SpannableStringBuilder(source)
+        builder.append(spannable)
+        return builder
+    }
 }

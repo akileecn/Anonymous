@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.support.annotation.UiThread
 import android.support.v7.app.AppCompatActivity
 import android.text.method.LinkMovementMethod
+import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
 import android.widget.AbsListView
@@ -27,11 +28,24 @@ class ThreadActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_thread)
-        initListener()
+        initView()
         initData()
     }
 
-    fun initListener() {
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        val id = item.itemId
+        if (id == android.R.id.home) {
+            finish()
+            return true
+        }
+        return super.onOptionsItemSelected(item)
+    }
+
+    fun initView() {
+        // 标题栏
+        val actionBar = supportActionBar!!
+        actionBar.setDisplayHomeAsUpEnabled(true)
+        actionBar.setHomeButtonEnabled(true)
         // 下拉刷新
         thread_srl.setOnRefreshListener {
             loadPost(true)

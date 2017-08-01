@@ -14,4 +14,5 @@ public class ExampleUnitTest {
     public void addition_isCorrect() throws Exception {
         System.err.println(DataUtils.INSTANCE.unicode2string("\\u8be5\\u677f\\u5757\\u4e0d\\u5b58\\u5728"));
     }
+
 }

@@ -1,21 +1,25 @@
 package cn.aki.anonymous;
 
 import android.content.Context;
-import android.provider.Settings;
 import android.support.test.InstrumentationRegistry;
 import android.support.test.runner.AndroidJUnit4;
 import android.text.Spanned;
-import android.text.format.DateUtils;
-import android.util.Log;
 
+import com.alibaba.fastjson.JSON;
+
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
+import org.jsoup.select.Elements;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
-import java.util.Date;
+import java.io.IOException;
 
+import cn.aki.anonymous.entity.Post;
 import cn.aki.anonymous.utils.DataUtils;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
 /**
  * Instrumentation test, which will execute on an Android device.
@@ -35,5 +39,24 @@ public class ExampleInstrumentedTest {
         Spanned spanned = DataUtils.INSTANCE.fromHtml(html);
         System.err.println(spanned);
 
+    }
+
+    @Test
+    public void parseHtml() throws IOException {
+        Document doc = Jsoup.connect("https://tnmb.org/Home/Forum/ref?id=171206").get();
+        Post post = new Post();
+        Elements elements = doc.getAllElements();
+        for (Element element : elements) {
+            if (element.hasAttr("data-threads-id")) {
+                post.setId(Integer.parseInt(element.attr("data-threads-id")));
+            } else if (element.hasClass("h-threads-info-uid")) {
+                post.setUserid(element.text().substring(3));
+            } else if (element.hasClass("h-threads-info-createdat")) {
+                post.setNow(element.text());
+            } else if (element.hasClass("h-threads-content")) {
+                post.setContent(element.text());
+            }
+        }
+        System.err.println(JSON.toJSONString(post));
     }
 }

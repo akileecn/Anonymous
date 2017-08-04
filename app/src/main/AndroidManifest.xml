@@ -31,6 +31,8 @@
         <activity android:name=".activity.ThreadActivity" />
         <!-- 版块编辑 -->
         <activity android:name=".activity.EditForumActivity" />
+        <!-- 发串 -->
+        <activity android:name=".activity.DoPostActivity" />
     </application>
 
 </manifest>

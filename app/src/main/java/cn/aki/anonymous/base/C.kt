@@ -73,5 +73,7 @@ object C {
         const val IMAGE_URL = "IMAGE_URL"
         // 串ID
         const val THREAD_ID = "THREAD_ID"
+        // 版块ID
+        const val FORUM_ID = "FORUM_ID"
     }
 }

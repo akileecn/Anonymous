@@ -43,9 +43,11 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     private var mThreadList = mutableListOf<PostThread>()
     private var mMenuItemRefresh: MenuItem? = null // 菜单刷新键
     private var mMenuItemEditForum: MenuItem? = null // 编辑版块
+    private var mMenuItemPost: MenuItem? = null // 发串
     private val mForumDao: ForumDao = ForumDao(this)
     private val mPostDao = PostDao()
-    private val REQUEST_CODE_EDIT_FORUM = 1
+    private val REQUEST_CODE_EDIT_FORUM = 1 // 请求码——编辑版块
+    private val REQUEST_CODE_POST = 2 // 请求码——发串
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -74,6 +76,8 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         menuInflater.inflate(R.menu.main, menu)
         mMenuItemRefresh = menu.findItem(R.id.menu_item_refresh)
         mMenuItemEditForum = menu.findItem(R.id.menu_item_edit_forum)
+        mMenuItemPost = menu.findItem(R.id.menu_item_post)
+        handlePostMenu()
         mMenuItemEditForum!!.isVisible = false
         return true
     }
@@ -90,6 +94,11 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             R.id.menu_item_edit_forum -> {
                 startActivityForResult(Intent(this, EditForumActivity::class.java), REQUEST_CODE_EDIT_FORUM)
                 return true
+            }
+            R.id.menu_item_post -> {
+                val intent = Intent(this, DoPostActivity::class.java)
+                intent.putExtra(C.Extra.FORUM_ID, mCurrentForumId)
+                startActivityForResult(intent, REQUEST_CODE_POST)
             }
         }
         return super.onOptionsItemSelected(item)
@@ -157,6 +166,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             if (forum.id != mCurrentForumId) {
                 mCurrentForumId = forum.id
                 toolbar.title = forum.name
+                handlePostMenu()
                 loadThread(true)
             }
         }
@@ -230,6 +240,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                     }
                 }
                 mCurrentForumId = it.data[0].id
+                handlePostMenu()
                 loadThread()
             } else {
                 MessageUtils.showToast(this@MainActivity, it.message!!)
@@ -291,5 +302,11 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                 }
             }
         }.execute()
+    }
+
+    private fun handlePostMenu(){
+        if(mMenuItemPost != null){
+            mMenuItemPost!!.isVisible = (mCurrentForumId != -1)
+        }
     }
 }

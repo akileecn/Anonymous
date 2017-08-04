@@ -5,7 +5,6 @@ import android.graphics.Color
 import android.os.Build
 import android.text.*
 import android.text.style.ForegroundColorSpan
-import android.util.Log
 import cn.aki.anonymous.R
 import cn.aki.anonymous.view.PostClickableSpan
 import java.text.SimpleDateFormat
@@ -40,9 +39,10 @@ object DataUtils {
         formatYear.timeZone = timeZone
     }
 
-    fun init(context: Context){
+    fun init(context: Context) {
         mContext = context
     }
+
     /**
      * 转译post.now字段
      */
@@ -93,7 +93,6 @@ object DataUtils {
         if (flag and FLAG_HANDLE_POST_ID != 0) {
             result = handlePostId(result)
         }
-        Log.e("html", result.toString())
         return result
     }
 
@@ -121,13 +120,13 @@ object DataUtils {
         return PATTERN_BR.matcher(html).replaceAll(" ")
     }
 
-    fun recodeAdminUserId(source: CharSequence): CharSequence{
+    fun recodeAdminUserId(source: CharSequence): CharSequence {
         val spannable = source as? Spannable ?: SpannableString(source)
         spannable.setSpan(ForegroundColorSpan(Color.RED), 0, source.length, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
         return spannable
     }
 
-    fun recodePoUserId(source: CharSequence): CharSequence{
+    fun recodePoUserId(source: CharSequence): CharSequence {
         val spannable = source as? Spannable ?: SpannableString("(po)")
         spannable.setSpan(ForegroundColorSpan(mContext!!.getColor(R.color.forgive)), 0, 4, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
         val builder = SpannableStringBuilder(source)

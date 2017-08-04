@@ -10,4 +10,5 @@
     <string name="id">ID</string>
     <string name="name">名称</string>
     <string name="replay">回复</string>
+    <string name="forum">版块</string>
 </resources>
